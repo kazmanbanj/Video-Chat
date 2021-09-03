@@ -1,10 +1,42 @@
 <template>
   <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/login">Login</router-link>
+    <Navigation :user="user" @logout="logout" />
+    <router-view :user="user" @logout="logout" />
   </div>
-  <router-view />
 </template>
+
+<script>
+import db from './db.js'
+import Navigation from '@/components/Navigation'
+import Firebase from 'firebase'
+
+export default {
+  name: 'App',
+  data: function() {
+    return {
+      user: null
+    }
+  },
+  methods: {
+    logout: function() {
+      Firebase.auth().signOut().then(() => {
+        this.user = null
+        this.$router.push('login')
+      })
+    },
+  },
+  mounted() {
+    Firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        this.user = user
+      }
+    })
+  },
+  components: {
+    Navigation
+  },
+}
+</script>
 
 <style lang="scss">
 @import 'node_modules/bootstrap/scss/bootstrap';
